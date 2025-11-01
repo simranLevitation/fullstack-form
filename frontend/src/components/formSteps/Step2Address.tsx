@@ -51,7 +51,7 @@ export const Step2Address: React.FC<Props> = ({ data, update }) => {
         setErrors((prev) => ({ ...prev, [field]: error }));
     };
 
-    // Always build a full Address object before calling update
+
     const handleChange = (field: keyof Address, rawValue: string) => {
         let value = rawValue;
 
@@ -59,7 +59,7 @@ export const Step2Address: React.FC<Props> = ({ data, update }) => {
             value = value.replace(/\D/g, ''); // allow only digits
         }
 
-        // Use current (complete Address) and override only the changed field
+
         const next: Address = {
             ...current,
             [field]: value,

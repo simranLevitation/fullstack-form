@@ -1,4 +1,4 @@
-// backend/src/controllers/form.controller.ts
+
 import { Request, Response } from 'express';
 import { IFormService } from '../services/form.services';
 
@@ -45,9 +45,9 @@ export class FormController {
     this.service = service;
   }
 
-  // Accept either body.address (JSON) or top-level fields (form-data)
+
   private normalizeAddress(body: Record<string, unknown>): AddressDto {
-    // prefer nested address object if present
+
     const nested = body?.address as Record<string, unknown> | undefined;
     if (nested && typeof nested === 'object') {
       return {
@@ -60,7 +60,6 @@ export class FormController {
       };
     }
 
-    // fallback to top-level fields
     return {
       line1: String(body?.line1 ?? ''),
       line2: body?.line2 ? String(body.line2) : undefined,
@@ -71,7 +70,7 @@ export class FormController {
     };
   }
 
-  // Ensure `data` is base64 without data:... prefix
+  
   private stripDataUrl(value: string): string {
     if (!value) return '';
     const comma = value.indexOf(',');
@@ -90,7 +89,6 @@ export class FormController {
 
       const files: NormalizedFile[] = [];
 
-      // Priority: multer memory files (actual binary buffers)
       if (multerFiles.length > 0) {
         for (const f of multerFiles) {
           const buffer = f.buffer ?? Buffer.from('');
@@ -105,11 +103,9 @@ export class FormController {
           });
         }
       } else if (jsonFiles.length > 0) {
-        // Client already sent files as base64 in JSON
+        
         for (const jf of jsonFiles) {
           const originalname = String(jf.originalname ?? jf.filename ?? 'file');
-
-          // safe fallback: prefer jf.mimeType, else try to read "mimetype" key if present
           const maybeOtherMime = (jf as unknown as Record<string, unknown>)['mimetype'];
           const mimeType = String(jf.mimeType ?? maybeOtherMime ?? 'application/octet-stream');
 
@@ -168,6 +164,16 @@ export class FormController {
     } catch (err) {
       console.error('FormController.get error:', err);
       res.status(400).json({ message: (err as Error).message });
+    }
+  }
+   async getAll(req: Request, res: Response): Promise<void> {
+    try {
+      const list = await this.service.getAll();
+
+      res.json(list);
+    } catch (err) {
+      console.error("FormController.getAll error:", err);
+      res.status(500).json({ message: (err as Error).message });
     }
   }
 }
